@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Maximize2, ShieldCheck } from 'lucide-react';
+import { X, Sparkles } from 'lucide-react';
 import { CookerImage } from '../../data/cookerData';
 
 interface CookerImageModalProps {
@@ -17,7 +17,7 @@ export const CookerImageModal: React.FC<CookerImageModalProps> = ({
 
   return (
     <div 
-      className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-fade-in"
+      className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 animate-fade-in"
       onClick={onClose}
     >
       <div 
@@ -25,19 +25,19 @@ export const CookerImageModal: React.FC<CookerImageModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header bar */}
-        <div className="p-4 bg-white border-b border-zinc-200 flex items-center justify-between">
+        <div className="p-4 bg-zinc-50 border-b border-zinc-200 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-bold text-[#946c07] bg-amber-50 px-2.5 py-0.5 rounded border border-[#d4af37]/40 uppercase">
+            <span className="text-[10px] font-black text-black bg-yellow-400 px-2.5 py-0.5 rounded uppercase">
               {image.badge}
             </span>
-            <h3 className="font-cinzel text-sm font-bold text-zinc-900">
+            <h3 className="font-cinzel text-sm font-bold text-zinc-950">
               {image.title}
             </h3>
           </div>
 
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg hover:bg-zinc-100 text-zinc-500 hover:text-black border border-zinc-200 cursor-pointer transition-colors"
+            className="p-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-600 hover:text-black border border-zinc-200 cursor-pointer transition-colors"
             aria-label="Close image modal"
           >
             <X className="w-5 h-5" />
@@ -45,7 +45,7 @@ export const CookerImageModal: React.FC<CookerImageModalProps> = ({
         </div>
 
         {/* Image Display */}
-        <div className="relative max-h-[70vh] overflow-hidden bg-zinc-950 flex items-center justify-center">
+        <div className="relative max-h-[70vh] overflow-hidden bg-zinc-950 flex items-center justify-center p-2">
           <img 
             src={image.url} 
             alt={image.title} 
@@ -54,7 +54,7 @@ export const CookerImageModal: React.FC<CookerImageModalProps> = ({
         </div>
 
         {/* Footer info */}
-        <div className="p-4 sm:p-5 bg-white border-t border-zinc-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="p-4 sm:p-5 bg-zinc-50 border-t border-zinc-200 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-zinc-600 font-normal text-center sm:text-left">
             {image.description}
           </p>
@@ -64,7 +64,7 @@ export const CookerImageModal: React.FC<CookerImageModalProps> = ({
               onClose();
               onScrollToOrder();
             }}
-            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#d4af37] to-[#b8912b] text-black font-extrabold text-xs uppercase tracking-wider shrink-0 cursor-pointer shadow-lg hover:opacity-90 transition-opacity"
+            className="px-5 py-2.5 rounded-xl bg-yellow-400 hover:bg-yellow-300 text-black font-black text-xs uppercase tracking-wider shrink-0 cursor-pointer shadow-md shadow-yellow-500/20 transition-all"
           >
             Order Now (Pay on Delivery)
           </button>

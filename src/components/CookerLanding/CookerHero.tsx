@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ShieldCheck, 
   Truck, 
   Sparkles, 
   Check, 
-  ArrowRight, 
   Flame, 
   Clock, 
   Maximize2, 
-  MessageCircle, 
   Banknote,
-  Wrench,
-  CheckCircle2
+  ChevronLeft,
+  ChevronRight,
+  Play, 
+  Pause
 } from 'lucide-react';
 import { COOKER_IMAGES, CookerImage } from '../../data/cookerData';
 import { formatPrice } from '../../utils/formatters';
@@ -25,10 +25,10 @@ interface CookerHeroProps {
 export const CookerHero: React.FC<CookerHeroProps> = ({
   onScrollToOrder,
   onOpenImageModal,
-  hasPlacedOrder = false,
 }) => {
   const [activeImageIdx, setActiveImageIdx] = useState(0);
   const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [isAutoPlay, setIsAutoPlay] = useState(true);
 
   const filteredImages = activeCategory === 'all' 
     ? COOKER_IMAGES 
@@ -36,31 +36,48 @@ export const CookerHero: React.FC<CookerHeroProps> = ({
 
   const currentImage = COOKER_IMAGES[activeImageIdx] || COOKER_IMAGES[0];
 
+  // Auto-slide effect every 3.2 seconds
+  useEffect(() => {
+    if (!isAutoPlay) return;
+    const interval = setInterval(() => {
+      setActiveImageIdx((prev) => (prev + 1) % COOKER_IMAGES.length);
+    }, 3200);
+    return () => clearInterval(interval);
+  }, [isAutoPlay]);
+
+  const handleNext = () => {
+    setActiveImageIdx((prev) => (prev + 1) % COOKER_IMAGES.length);
+  };
+
+  const handlePrev = () => {
+    setActiveImageIdx((prev) => (prev - 1 + COOKER_IMAGES.length) % COOKER_IMAGES.length);
+  };
+
   const originalPrice = 250000;
   const salePrice = 170000;
   const savings = originalPrice - salePrice;
 
   return (
-    <section id="overview" className="pt-8 pb-14 bg-white border-b border-zinc-200 relative overflow-hidden">
+    <section id="overview" className="pt-8 pb-14 bg-white border-b border-zinc-200 relative overflow-hidden text-zinc-900">
       {/* Background ambient lighting */}
-      <div className="absolute top-10 left-10 w-96 h-96 bg-[#d4af37]/5 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-96 h-96 bg-amber-50/60 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute top-10 left-10 w-96 h-96 bg-yellow-400/10 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-10 right-10 w-96 h-96 bg-yellow-500/5 rounded-full blur-[140px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Breadcrumb & Social Proof */}
         <div className="flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b border-zinc-200 text-xs text-zinc-500">
           <div className="flex items-center gap-2">
-            <span className="text-[#b8860b] font-bold">NOBLESTONE KITCHEN COLLECTION</span>
-            <span>/</span>
-            <span className="text-zinc-900 font-medium">Smart Flip-Up Glass Cooktop</span>
+            <span className="text-black font-extrabold uppercase tracking-wider">NOBLESTONE KITCHEN COLLECTION</span>
+            <span className="text-zinc-400">/</span>
+            <span className="text-zinc-800 font-semibold">Smart Flip-Up Glass Cooktop</span>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded bg-[#d4af37]/15 text-[#946c07] font-bold border border-[#d4af37]/40 text-[11px] uppercase tracking-wider">
+            <span className="px-2.5 py-0.5 rounded bg-yellow-400 text-black font-black text-[11px] uppercase tracking-wider">
               Nationwide Delivery
             </span>
-            <span className="text-zinc-600 text-[11px] font-medium">Pay On Delivery Available</span>
+            <span className="text-zinc-700 text-[11px] font-bold">Pay On Delivery Available</span>
           </div>
         </div>
 
@@ -69,72 +86,121 @@ export const CookerHero: React.FC<CookerHeroProps> = ({
           
           {/* Left Column: Image Viewport & All 15 Product Images */}
           <div className="lg:col-span-7 space-y-4">
-            {/* Primary Image Viewport */}
-            <div className="relative aspect-[4/3] sm:aspect-[16/11] rounded-2xl overflow-hidden bg-zinc-100 border border-zinc-200 shadow-xl group">
+            {/* Primary Image Viewport with Auto-Slide */}
+            <div 
+              className="relative aspect-[4/3] sm:aspect-[16/11] rounded-2xl overflow-hidden bg-zinc-950 border-2 border-yellow-400/40 shadow-xl group"
+              onMouseEnter={() => setIsAutoPlay(false)}
+              onMouseLeave={() => setIsAutoPlay(true)}
+            >
               <img 
+                key={currentImage.id}
                 src={currentImage.url} 
                 alt={currentImage.title}
-                className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                className="w-full h-full object-cover object-center transition-all duration-700 animate-fade-in group-hover:scale-105"
               />
 
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/30 pointer-events-none" />
 
               {/* Badges */}
-              <div className="absolute top-4 left-4 flex flex-col gap-2">
-                <span className="px-3 py-1 rounded bg-[#d4af37] text-black text-xs font-black uppercase tracking-wider shadow-lg">
+              <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
+                <span className="px-3 py-1 rounded bg-yellow-400 text-black text-xs font-black uppercase tracking-wider shadow-lg">
                   ★ BEST SELLER • 32% OFF
                 </span>
-                <span className="px-2.5 py-1 rounded bg-black/80 backdrop-blur-md text-[11px] font-semibold text-emerald-400 border border-emerald-500/30">
-                  Pay on Delivery Available Nationwide
+                <span className="px-2.5 py-1 rounded bg-black/85 backdrop-blur-md text-[11px] font-bold text-yellow-300 border border-yellow-400/40 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-yellow-400 animate-ping inline-block" />
+                  Auto-Sliding • {activeImageIdx + 1} of {COOKER_IMAGES.length}
                 </span>
               </div>
 
-              {/* Zoom Trigger Button */}
+              {/* Top Right Controls: Auto-Play toggle & Zoom Trigger */}
+              <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
+                <button
+                  onClick={() => setIsAutoPlay(!isAutoPlay)}
+                  className="p-2 rounded-xl bg-black/80 hover:bg-black text-yellow-400 border border-yellow-400/30 transition-all cursor-pointer"
+                  title={isAutoPlay ? "Pause Auto-Slide" : "Resume Auto-Slide"}
+                >
+                  {isAutoPlay ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                </button>
+
+                <button
+                  onClick={() => onOpenImageModal(currentImage)}
+                  className="p-2 rounded-xl bg-black/80 hover:bg-black text-white border border-yellow-400/30 transition-all cursor-pointer opacity-80 hover:opacity-100"
+                  title="Click to view full image in high-definition"
+                >
+                  <Maximize2 className="w-4 h-4 text-yellow-400" />
+                </button>
+              </div>
+
+              {/* Previous Slide Arrow */}
               <button
-                onClick={() => onOpenImageModal(currentImage)}
-                className="absolute top-4 right-4 p-2 rounded-xl bg-black/70 hover:bg-black text-white border border-white/20 transition-all cursor-pointer opacity-80 hover:opacity-100"
-                title="Click to view full image in high-definition"
+                onClick={handlePrev}
+                className="absolute left-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-black/75 hover:bg-yellow-400 text-white hover:text-black border border-yellow-400/40 transition-all cursor-pointer z-10 shadow-lg"
+                aria-label="Previous slide"
               >
-                <Maximize2 className="w-4 h-4 text-[#d4af37]" />
+                <ChevronLeft className="w-5 h-5" />
               </button>
 
-              {/* Caption Overlay */}
-              <div className="absolute bottom-4 left-4 right-4 p-3.5 rounded-xl bg-black/85 backdrop-blur-md border border-white/10 text-left">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-cinzel text-xs sm:text-sm font-bold text-white">
-                    {currentImage.title}
-                  </h4>
-                  <span className="text-[10px] font-bold text-[#d4af37] bg-[#d4af37]/15 px-2 py-0.5 rounded border border-[#d4af37]/30 uppercase">
-                    {currentImage.badge}
-                  </span>
+              {/* Next Slide Arrow */}
+              <button
+                onClick={handleNext}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-black/75 hover:bg-yellow-400 text-white hover:text-black border border-yellow-400/40 transition-all cursor-pointer z-10 shadow-lg"
+                aria-label="Next slide"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+
+              {/* Bottom Caption Overlay */}
+              <div className="absolute bottom-4 left-4 right-4 p-4 rounded-xl bg-black/85 backdrop-blur-md border border-yellow-400/30 text-white z-10">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <span className="text-[10px] font-black uppercase text-yellow-400 tracking-wider">
+                      {currentImage.badge}
+                    </span>
+                    <h3 className="font-cinzel text-sm sm:text-base font-bold text-white truncate">
+                      {currentImage.title}
+                    </h3>
+                  </div>
+                  <button
+                    onClick={() => onOpenImageModal(currentImage)}
+                    className="text-xs text-yellow-400 hover:text-yellow-300 font-bold underline shrink-0 cursor-pointer"
+                  >
+                    Inspect HD
+                  </button>
                 </div>
-                <p className="text-[11px] text-zinc-300 font-light mt-0.5 line-clamp-2">
+                <p className="text-xs text-zinc-300 font-normal line-clamp-1 mt-0.5">
                   {currentImage.description}
                 </p>
               </div>
             </div>
 
-            {/* Gallery Category Filter Tabs */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-[11px] scrollbar-none">
+            {/* Quick Angle Filter Buttons */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs">
               {[
-                { id: 'all', label: 'All 15 Photos' },
-                { id: 'overview', label: 'Cooktop Overview' },
-                { id: 'components', label: 'Component Guide' },
-                { id: 'cleaning', label: '90° Flip Cleaning' },
-                { id: 'controls', label: 'Controls & Timer' },
-                { id: 'burners', label: 'Burners & Heat' },
-                { id: 'dimensions', label: 'Dimensions' },
-              ].map((tab) => (
+                { id: 'all', label: 'All 15 Angles' },
+                { id: 'overview', label: 'Overview' },
+                { id: 'components', label: 'Parts Guide' },
+                { id: 'cleaning', label: '90° Flip' },
+                { id: 'controls', label: 'Controls' },
+                { id: 'burners', label: 'Burners' },
+                { id: 'lifestyle', label: 'Lifestyle' },
+                { id: 'dimensions', label: 'Cutout' },
+              ].map((cat) => (
                 <button
-                  key={tab.id}
-                  onClick={() => setActiveCategory(tab.id)}
-                  className={`px-3 py-1.5 rounded-lg font-medium whitespace-nowrap transition-all cursor-pointer ${
-                    activeCategory === tab.id
-                      ? 'bg-[#d4af37] text-black font-bold shadow'
+                  key={cat.id}
+                  onClick={() => {
+                    setActiveCategory(cat.id);
+                    if (cat.id !== 'all') {
+                      const firstMatch = COOKER_IMAGES.findIndex(img => img.category === cat.id);
+                      if (firstMatch !== -1) setActiveImageIdx(firstMatch);
+                    }
+                  }}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                    activeCategory === cat.id
+                      ? 'bg-yellow-400 text-black shadow-md font-black'
                       : 'bg-zinc-100 text-zinc-700 hover:text-black hover:bg-zinc-200 border border-zinc-200'
                   }`}
                 >
-                  {tab.label}
+                  {cat.label}
                 </button>
               ))}
             </div>
@@ -150,7 +216,7 @@ export const CookerHero: React.FC<CookerHeroProps> = ({
                     onClick={() => setActiveImageIdx(originalIndex)}
                     className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${
                       isSelected 
-                        ? 'border-[#d4af37] scale-105 shadow-md shadow-[#d4af37]/30 ring-2 ring-[#d4af37]/40' 
+                        ? 'border-yellow-400 scale-105 shadow-md shadow-yellow-400/30 ring-2 ring-yellow-400/40' 
                         : 'border-zinc-200 opacity-70 hover:opacity-100 hover:border-zinc-400'
                     }`}
                   >
@@ -162,35 +228,35 @@ export const CookerHero: React.FC<CookerHeroProps> = ({
 
             {/* Trust Points Row */}
             <div className="grid grid-cols-3 gap-3 pt-2 text-center text-xs">
-              <div className="p-3 rounded-xl bg-zinc-50 border border-zinc-200 shadow-sm flex flex-col items-center justify-center">
-                <Banknote className="w-5 h-5 text-[#b8860b] mb-1" />
+              <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 shadow-xs flex flex-col items-center justify-center">
+                <Banknote className="w-5 h-5 text-yellow-500 mb-1" />
                 <span className="font-bold text-zinc-900">Pay On Delivery</span>
                 <span className="text-[10px] text-zinc-500">Inspect before paying</span>
               </div>
-              <div className="p-3 rounded-xl bg-zinc-50 border border-zinc-200 shadow-sm flex flex-col items-center justify-center">
-                <ShieldCheck className="w-5 h-5 text-emerald-600 mb-1" />
+              <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 shadow-xs flex flex-col items-center justify-center">
+                <ShieldCheck className="w-5 h-5 text-yellow-500 mb-1" />
                 <span className="font-bold text-zinc-900">2-Year Warranty</span>
                 <span className="text-[10px] text-zinc-500">Burner &amp; Glass protection</span>
               </div>
-              <div className="p-3 rounded-xl bg-zinc-50 border border-zinc-200 shadow-sm flex flex-col items-center justify-center">
-                <Truck className="w-5 h-5 text-[#b8860b] mb-1" />
+              <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 shadow-xs flex flex-col items-center justify-center">
+                <Truck className="w-5 h-5 text-yellow-500 mb-1" />
                 <span className="font-bold text-zinc-900">Fast Nationwide</span>
                 <span className="text-[10px] text-zinc-500">All 36 States Covered</span>
               </div>
             </div>
           </div>
 
-          {/* Right Column: High-Converting Product Narrative & Action Box */}
+          {/* Right Column: Product Details & Action Box */}
           <div className="lg:col-span-5 space-y-6">
             
             {/* Title & Headline */}
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-[#d4af37]/40 text-xs font-semibold text-[#946c07]">
-                <Sparkles className="w-3.5 h-3.5 text-[#b8860b]" />
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-400/20 border border-yellow-400/50 text-xs font-bold text-black">
+                <Sparkles className="w-3.5 h-3.5 text-yellow-500" />
                 <span>Next-Gen Kitchen Cooking Technology</span>
               </div>
 
-              <h1 className="font-cinzel text-2xl sm:text-3xl font-extrabold text-zinc-900 leading-tight">
+              <h1 className="font-cinzel text-2xl sm:text-3xl font-extrabold text-zinc-950 leading-tight">
                 Premium 2-Burner Flip-Up Glass Gas Cooker
               </h1>
 
@@ -200,11 +266,11 @@ export const CookerHero: React.FC<CookerHeroProps> = ({
             </div>
 
             {/* Price Box */}
-            <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-amber-50/70 via-white to-amber-50/40 border border-[#d4af37]/50 shadow-md space-y-2">
+            <div className="p-5 rounded-2xl bg-zinc-50 border-2 border-yellow-400 shadow-lg space-y-3">
               <div className="flex items-baseline justify-between">
                 <div>
                   <span className="text-xs text-zinc-500 font-semibold uppercase tracking-wider block">Special Promotional Price:</span>
-                  <div className="text-2xl sm:text-3xl font-black text-zinc-900">
+                  <div className="text-3xl font-black text-zinc-950">
                     {formatPrice(salePrice)}
                   </div>
                   <div className="text-xs text-zinc-400 line-through mt-0.5">
@@ -213,43 +279,43 @@ export const CookerHero: React.FC<CookerHeroProps> = ({
                 </div>
 
                 <div className="text-right">
-                  <span className="inline-block px-3 py-1 rounded-lg text-xs font-black text-emerald-800 bg-emerald-100 border border-emerald-300">
+                  <span className="inline-block px-3 py-1 rounded-lg text-xs font-black text-black bg-yellow-400 shadow-sm">
                     SAVE {formatPrice(savings)}
                   </span>
-                  <p className="text-[10px] text-[#946c07] font-bold mt-1">
+                  <p className="text-[11px] text-zinc-700 font-bold mt-1">
                     Free Insured Delivery
                   </p>
                 </div>
               </div>
 
               {/* Scarcity / Stock Alert */}
-              <div className="pt-3 border-t border-amber-200/60 flex items-center gap-2 text-xs text-amber-900 bg-amber-100/60 p-2.5 rounded-lg border border-amber-300">
-                <Clock className="w-4 h-4 text-amber-600 shrink-0 animate-pulse" />
-                <span><strong>High Demand:</strong> Only 6 units remaining in our Lagos warehouse for this promo batch!</span>
+              <div className="pt-3 border-t border-zinc-200 flex items-center gap-2 text-xs text-zinc-800 bg-amber-50 p-2.5 rounded-lg border border-yellow-300">
+                <Clock className="w-4 h-4 text-yellow-600 shrink-0 animate-pulse" />
+                <span><strong>High Demand:</strong> Only 6 units remaining in our central dispatch depot for this batch!</span>
               </div>
             </div>
 
             {/* Core Innovations Bullets */}
             <div className="space-y-2.5 text-xs text-zinc-700">
               <div className="flex items-start gap-2.5">
-                <Check className="w-4 h-4 text-[#b8860b] mt-0.5 shrink-0" />
-                <span><strong className="text-zinc-900">90° Hinged Flip-Top Burners:</strong> Lift both burners upward to wipe away burnt oil and soup spills underneath in one second.</span>
+                <Check className="w-4 h-4 text-yellow-500 mt-0.5 shrink-0" />
+                <span><strong className="text-zinc-950">90° Hinged Flip-Top Burners:</strong> Lift both burners upward to wipe away burnt oil and soup spills underneath in one second.</span>
               </div>
               <div className="flex items-start gap-2.5">
-                <Check className="w-4 h-4 text-[#b8860b] mt-0.5 shrink-0" />
-                <span><strong className="text-zinc-900">Smart Center Digital LED Display:</strong> Displays precise cooking countdown timer (0-99 min) and 4-bar ignition battery status.</span>
+                <Check className="w-4 h-4 text-yellow-500 mt-0.5 shrink-0" />
+                <span><strong className="text-zinc-950">Smart Center Digital LED Display:</strong> Displays precise cooking countdown timer (0-99 min) and 4-bar ignition battery status.</span>
               </div>
               <div className="flex items-start gap-2.5">
-                <Check className="w-4 h-4 text-[#b8860b] mt-0.5 shrink-0" />
-                <span><strong className="text-zinc-900">Tabletop &amp; Built-in Dual Use:</strong> Use immediately on your kitchen table with 4 rubber feet, or drop into a 650×350mm cutout.</span>
+                <Check className="w-4 h-4 text-yellow-500 mt-0.5 shrink-0" />
+                <span><strong className="text-zinc-950">Tabletop &amp; Built-in Dual Use:</strong> Use immediately on your kitchen table with 4 rubber feet, or drop into a 650×350mm cutout.</span>
               </div>
               <div className="flex items-start gap-2.5">
-                <Check className="w-4 h-4 text-[#b8860b] mt-0.5 shrink-0" />
-                <span><strong className="text-zinc-900">Multi-Jet Vortex High-Heat Burners:</strong> Powerful 5.2kW circular flame delivers even heat distribution for rapid frying and boiling.</span>
+                <Check className="w-4 h-4 text-yellow-500 mt-0.5 shrink-0" />
+                <span><strong className="text-zinc-950">Multi-Jet Vortex High-Heat Burners:</strong> Powerful 5.2kW circular flame delivers even heat distribution for rapid frying and boiling.</span>
               </div>
               <div className="flex items-start gap-2.5">
-                <Check className="w-4 h-4 text-[#b8860b] mt-0.5 shrink-0" />
-                <span><strong className="text-zinc-900">Flame-Failure Thermocouple:</strong> Automatically shuts off gas flow within 3 seconds if wind or soup extinguishes the flame.</span>
+                <Check className="w-4 h-4 text-yellow-500 mt-0.5 shrink-0" />
+                <span><strong className="text-zinc-950">Flame-Failure Thermocouple:</strong> Automatically shuts off gas flow within 3 seconds if wind or soup extinguishes the flame.</span>
               </div>
             </div>
 
@@ -257,7 +323,7 @@ export const CookerHero: React.FC<CookerHeroProps> = ({
             <div className="space-y-3 pt-2">
               <button
                 onClick={onScrollToOrder}
-                className="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-[#d4af37] via-[#e5c578] to-[#b8912b] hover:from-[#e5c578] hover:to-[#cfa83e] text-black font-black text-sm uppercase tracking-widest shadow-xl shadow-[#d4af37]/25 transition-all transform hover:scale-[1.01] active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-4 px-6 rounded-xl bg-yellow-400 hover:bg-yellow-300 text-black font-black text-sm uppercase tracking-widest shadow-xl shadow-yellow-500/25 transition-all transform hover:scale-[1.01] active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Sparkles className="w-5 h-5 text-black" />
                 <span>ORDER NOW — PAY ON DELIVERY</span>
@@ -266,19 +332,6 @@ export const CookerHero: React.FC<CookerHeroProps> = ({
               <p className="text-center text-[11px] text-zinc-500">
                 🔒 Zero financial risk. Inspect, test, and verify at your doorstep before making payment!
               </p>
-
-              {/* Direct WhatsApp Consultation (Shown only after customer places an order) */}
-              {hasPlacedOrder && (
-                <a
-                  href="https://wa.me/2349117446764?text=Hello%20Noblestone%20Bathrooms%2C%20I%20want%20to%20follow%20up%20on%20my%20order%20for%20the%202-Burner%20Flip-Up%20Glass%20Cooker"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full py-2.5 rounded-lg bg-[#25D366]/10 hover:bg-[#25D366]/20 border border-[#25D366]/30 text-[#25D366] text-xs font-bold flex items-center justify-center gap-2 transition-colors"
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  <span>Chat with Dispatch Desk on WhatsApp (09117446764)</span>
-                </a>
-              )}
             </div>
 
           </div>

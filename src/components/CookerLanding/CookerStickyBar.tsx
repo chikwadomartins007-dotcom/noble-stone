@@ -12,7 +12,7 @@ export const CookerStickyBar: React.FC<CookerStickyBarProps> = ({ onScrollToOrde
       <div className="max-w-md mx-auto flex items-center justify-between gap-3">
         <div>
           <div className="flex items-baseline gap-1.5">
-            <span className="text-base font-black text-zinc-900">
+            <span className="text-base font-black text-zinc-950">
               {formatPrice(170000)}
             </span>
             <span className="text-[10px] text-zinc-400 line-through">
@@ -26,7 +26,7 @@ export const CookerStickyBar: React.FC<CookerStickyBarProps> = ({ onScrollToOrde
 
         <button
           onClick={onScrollToOrder}
-          className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-[#d4af37] via-[#e5c578] to-[#b8912b] text-black font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-lg shadow-[#d4af37]/20 active:scale-95 transition-transform cursor-pointer"
+          className="flex-1 py-3 px-4 rounded-xl bg-yellow-400 hover:bg-yellow-300 text-black font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-lg shadow-yellow-500/25 active:scale-95 transition-transform cursor-pointer"
         >
           <Sparkles className="w-3.5 h-3.5 text-black" />
           <span>Order Now (POD)</span>

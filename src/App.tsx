@@ -7,7 +7,6 @@ import { CookerGalleryShowcase } from './components/CookerLanding/CookerGalleryS
 import { CookerPricingPackages } from './components/CookerLanding/CookerPricingPackages';
 import { CookerOrderForm } from './components/CookerLanding/CookerOrderForm';
 import { CookerFaq } from './components/CookerLanding/CookerFaq';
-import { ShowroomContactSection } from './components/ShowroomContactSection';
 import { Footer } from './components/Footer';
 import { CookerImageModal } from './components/CookerLanding/CookerImageModal';
 import { OrderTrackingModal } from './components/OrderTrackingModal';
@@ -25,24 +24,9 @@ export default function App() {
   const [isTrackingOpen, setIsTrackingOpen] = useState(false);
   const [activeTrackingId, setActiveTrackingId] = useState<string>('');
 
-  // Track whether customer has completed an order (check localStorage or current session)
-  const [hasPlacedOrder, setHasPlacedOrder] = useState<boolean>(() => {
-    try {
-      const orders = JSON.parse(localStorage.getItem('noblestone_orders') || '[]');
-      return Array.isArray(orders) && orders.length > 0;
-    } catch {
-      return false;
-    }
-  });
-
-  const [latestOrder, setLatestOrder] = useState<CustomerOrder | null>(() => {
-    try {
-      const orders = JSON.parse(localStorage.getItem('noblestone_orders') || '[]');
-      return Array.isArray(orders) && orders.length > 0 ? orders[0] : null;
-    } catch {
-      return null;
-    }
-  });
+  // Track whether customer has completed an order in this session
+  const [hasPlacedOrder, setHasPlacedOrder] = useState<boolean>(false);
+  const [latestOrder, setLatestOrder] = useState<CustomerOrder | null>(null);
 
   // Quick Order Popup state & 35-second interval timer
   const [isQuickOrderOpen, setIsQuickOrderOpen] = useState(false);
@@ -77,7 +61,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-zinc-900 flex flex-col font-sans selection:bg-[#d4af37] selection:text-black">
+    <div className="min-h-screen bg-white text-zinc-900 flex flex-col font-sans selection:bg-yellow-400 selection:text-black">
       {/* Landing Header */}
       <CookerHeader
         onScrollToOrder={scrollToOrder}
@@ -130,9 +114,6 @@ export default function App() {
 
         {/* Technical FAQ */}
         <CookerFaq hasPlacedOrder={hasPlacedOrder} />
-
-        {/* Physical Showroom & Contact Details */}
-        <ShowroomContactSection hasPlacedOrder={hasPlacedOrder} />
       </main>
 
       {/* Footer */}

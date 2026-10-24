@@ -29,7 +29,7 @@ body {
   font-family: 'Playfair Display', Georgia, serif;
 }
 
-/* Custom luxury scrollbar */
+/* Custom yellow & black scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -45,7 +45,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #d4af37;
+  background: #facc15;
 }
 
 @keyframes shimmer {
@@ -57,28 +57,42 @@ body {
   }
 }
 
-.gold-gradient-text {
-  background: linear-gradient(135deg, #b8860b 0%, #d4af37 50%, #996515 100%);
+.gold-gradient-text,
+.yellow-gradient-text {
+  background: linear-gradient(135deg, #facc15 0%, #fde047 50%, #eab308 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.silver-gradient-text {
-  background: linear-gradient(135deg, #18181b 0%, #52525b 50%, #27272a 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.gold-border-glow {
-  box-shadow: 0 0 25px rgba(212, 175, 55, 0.15);
+.yellow-border-glow {
+  box-shadow: 0 0 25px rgba(250, 204, 21, 0.25);
 }
 
 .luxury-card {
-  background: #ffffff;
-  border: 1px solid #e4e4e7;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+  background: #0c0e14;
+  border: 1px solid rgba(250, 204, 21, 0.2);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.6);
 }
 
 .luxury-card:hover {
-  border-color: rgba(212, 175, 55, 0.6);
+  border-color: rgba(250, 204, 21, 0.7);
+}
+
+@keyframes marqueeSlide {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee-infinite {
+  display: flex;
+  width: max-content;
+  animation: marqueeSlide 30s linear infinite;
+}
+
+.animate-marquee-infinite:hover {
+  animation-play-state: paused;
 }

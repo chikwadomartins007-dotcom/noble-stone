@@ -3,10 +3,8 @@ import {
   Truck, 
   ShieldCheck, 
   Banknote, 
-  Award, 
-  Cpu, 
-  Wrench,
-  ThumbsUp
+  Flame, 
+  Wrench
 } from 'lucide-react';
 
 export const TrustBadges: React.FC = () => {
@@ -14,27 +12,27 @@ export const TrustBadges: React.FC = () => {
     {
       icon: Banknote,
       title: 'Pay on Delivery Nationwide',
-      description: 'Zero financial risk. Inspect & verify your fixtures before paying by cash, POS, or mobile transfer.'
+      description: 'Zero financial risk. Inspect & verify your cooker before paying by cash, POS, or mobile transfer.'
     },
     {
       icon: Truck,
-      title: 'Insured Priority Shipping',
-      description: 'Same-day/24h dispatch in Lagos & Abuja; 48-72h across all 36 states in reinforced protective wooden crates.'
+      title: 'Free Priority Shipping',
+      description: 'Daily dispatch to all 36 states in reinforced shock-proof protective safety packaging.'
     },
     {
       icon: ShieldCheck,
-      title: '5-Year Brass Engine Warranty',
-      description: 'Manufactured with high-density refined H59 brass valves. Complete free replacement if issues arise.'
+      title: '2-Year Full Warranty',
+      description: 'Covered against factory defects, tempered glass integrity, and burner crown durability.'
     },
     {
-      icon: Cpu,
-      title: 'Micro-Hydro Turbine Tech',
-      description: 'Patented water-powered LED temperature display. Zero batteries, zero wiring, 100% waterproof.'
+      icon: Flame,
+      title: 'Vortex Blue Flame Tech',
+      description: 'Pure 5.2kW multi-jet blue flame that eliminates soot, saves 28% gas, and boils 35% faster.'
     },
     {
       icon: Wrench,
-      title: 'Standard Universal Plumbing',
-      description: 'Designed strictly to international 1/2" G1/2 pipe fittings. Easily installed by any licensed plumber.'
+      title: 'Tabletop or Built-In',
+      description: 'Ready to use straight out of the box on countertops, or drop smoothly into cabinet cutouts.'
     }
   ];
 
@@ -47,12 +45,12 @@ export const TrustBadges: React.FC = () => {
             return (
               <div 
                 key={idx}
-                className="p-5 rounded-xl bg-white border border-zinc-200 shadow-sm hover:border-[#d4af37] hover:shadow-md transition-all group flex flex-col items-start"
+                className="p-5 rounded-xl bg-white border border-zinc-200 shadow-xs hover:border-yellow-400 hover:shadow-md transition-all group flex flex-col items-start"
               >
-                <div className="w-10 h-10 rounded-lg bg-amber-50 border border-[#d4af37]/40 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-[#d4af37] transition-all">
-                  <Icon className="w-5 h-5 text-[#b8860b] group-hover:text-black transition-colors" />
+                <div className="w-10 h-10 rounded-lg bg-yellow-400/20 border border-yellow-400/50 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-yellow-400 transition-all">
+                  <Icon className="w-5 h-5 text-yellow-600 group-hover:text-black transition-colors" />
                 </div>
-                <h4 className="font-cinzel text-sm font-bold text-zinc-900 mb-1.5 group-hover:text-[#b8860b] transition-colors">
+                <h4 className="font-cinzel text-sm font-bold text-zinc-950 mb-1.5 group-hover:text-black transition-colors">
                   {item.title}
                 </h4>
                 <p className="text-xs text-zinc-600 font-normal leading-relaxed">

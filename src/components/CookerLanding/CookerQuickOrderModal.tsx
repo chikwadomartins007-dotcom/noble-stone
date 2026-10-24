@@ -1,40 +1,37 @@
 import React, { useState } from 'react';
 import { 
   X, 
+  Flame, 
   ShieldCheck, 
   Truck, 
-  CheckCircle2, 
-  Phone, 
   MapPin, 
-  Sparkles, 
-  Clock, 
-  AlertCircle,
-  FileText,
+  Phone, 
+  CheckCircle2, 
   Lock,
-  Flame
+  FileText
 } from 'lucide-react';
-import { CustomerOrder } from '../../types';
 import { formatPrice, generateOrderId, generateWhatsAppOrderLink, NIGERIAN_STATES } from '../../utils/formatters';
+import { CustomerOrder } from '../../types';
 
 interface CookerQuickOrderModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onOrderSuccess: (order: CustomerOrder) => void;
-  onOpenTrackingWithId: (id: string) => void;
   selectedQuantity?: number;
   onQuantityChange?: (qty: number) => void;
+  onOrderSuccess: (order: CustomerOrder) => void;
+  onOpenTrackingWithId: (orderId: string) => void;
 }
 
 export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
   isOpen,
   onClose,
+  selectedQuantity = 1,
+  onQuantityChange,
   onOrderSuccess,
   onOpenTrackingWithId,
-  selectedQuantity: externalQuantity = 1,
-  onQuantityChange,
 }) => {
-  const [internalQuantity, setInternalQuantity] = useState<number>(externalQuantity);
-  const currentQuantity = onQuantityChange ? externalQuantity : internalQuantity;
+  const [internalQuantity, setInternalQuantity] = useState(selectedQuantity);
+  const currentQuantity = selectedQuantity || internalQuantity;
 
   const setQuantity = (qty: number) => {
     if (onQuantityChange) {
@@ -74,7 +71,6 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
     e.preventDefault();
 
     if (!fullName.trim() || !phone.trim() || !address.trim() || !city.trim()) {
-      alert('Please fill out your Full Name, Phone Number, Delivery Address, and City.');
       return;
     }
 
@@ -108,16 +104,16 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
       },
       pricing: {
         subtotal: totalPrice,
-        discountAmount: 0,
+        discountAmount: currentQuantity > 1 ? (currentQuantity * 170000) - totalPrice : 0,
         deliveryFee: 0,
         total: totalPrice,
       },
       paymentMethod: 'pay-on-delivery',
-      status: 'confirmed',
+      status: 'processing',
       trackingNumber: orderId,
     };
 
-    // Forward to Formspree for instant store email alert
+    // Forward to Formspree
     try {
       await fetch('https://formspree.io/f/xyekoajq', {
         method: 'POST',
@@ -126,12 +122,11 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
           'Accept': 'application/json',
         },
         body: JSON.stringify({
-          _subject: `⚡ QUICK ORDER #${orderId} - ${fullName} (₦${totalPrice.toLocaleString()})`,
           order_id: orderId,
           order_type: 'Quick Order Pop-Up',
           customer_name: fullName,
           phone_number: phone,
-          whatsapp_or_alt_phone: altPhone || phone,
+          alternative_phone: altPhone || phone,
           delivery_address: address,
           city_area: city,
           state: state,
@@ -161,7 +156,7 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
       {/* Click outside to close (only if order not yet placed) */}
       <div 
         className="fixed inset-0" 
@@ -170,16 +165,16 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
         }} 
       />
 
-      <div className="relative bg-white border border-zinc-200 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden my-auto z-10 animate-fade-in text-zinc-900">
+      <div className="relative bg-white border-2 border-yellow-400 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden my-auto z-10 animate-fade-in text-zinc-900">
         
         {/* Top Header Bar */}
-        <div className="bg-gradient-to-r from-[#d4af37] via-[#f1d779] to-[#d4af37] text-black px-5 py-3 sm:py-3.5 flex items-center justify-between shadow-md">
+        <div className="bg-yellow-400 text-black px-5 py-3 sm:py-3.5 flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2">
             <span className="flex h-2.5 w-2.5 relative">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-600 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-600"></span>
             </span>
-            <span className="font-extrabold text-xs sm:text-sm uppercase tracking-wider flex items-center gap-1.5">
+            <span className="font-black text-xs sm:text-sm uppercase tracking-wider flex items-center gap-1.5">
               <Flame className="w-4 h-4 fill-black" />
               ⚡ QUICK ORDER • PAY ON DELIVERY (POD)
             </span>
@@ -198,19 +193,19 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
         {confirmedOrder ? (
           /* Order Confirmation View */
           <div className="p-6 sm:p-8 space-y-6 text-center">
-            <div className="w-16 h-16 rounded-full bg-emerald-100 border-2 border-emerald-500 text-emerald-600 mx-auto flex items-center justify-center animate-bounce">
+            <div className="w-16 h-16 rounded-full bg-yellow-400 text-black mx-auto flex items-center justify-center shadow-lg shadow-yellow-500/30 animate-bounce">
               <CheckCircle2 className="w-10 h-10" />
             </div>
 
             <div>
-              <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-300">
-                Order Received & Verified
+              <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-yellow-400/20 text-black border border-yellow-400/40">
+                Order Received &amp; Logged
               </span>
-              <h2 className="text-2xl sm:text-3xl font-black text-zinc-900 mt-3">
+              <h2 className="text-2xl sm:text-3xl font-black text-zinc-950 mt-3">
                 Thank You, {confirmedOrder.customer.fullName}!
               </h2>
               <p className="text-sm text-zinc-600 mt-2 max-w-md mx-auto">
-                Your order for the <strong className="text-zinc-900">Premium 2-Burner Flip-Up Cooker</strong> is booked. Our dispatch rider will call you shortly on <span className="text-[#b8860b] font-bold">{confirmedOrder.customer.phone}</span> prior to delivery.
+                Your order for the <strong className="text-black">Premium 2-Burner Flip-Up Cooker</strong> is booked. Our dispatch rider will call you shortly on <span className="text-black font-bold">{confirmedOrder.customer.phone}</span> prior to delivery.
               </p>
             </div>
 
@@ -218,23 +213,23 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
             <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-4 sm:p-5 text-left space-y-3">
               <div className="flex justify-between items-center border-b border-zinc-200 pb-3">
                 <span className="text-xs text-zinc-500 uppercase font-semibold">Order Reference:</span>
-                <span className="text-sm font-mono font-bold text-zinc-900">{confirmedOrder.orderId}</span>
+                <span className="text-sm font-mono font-bold text-black">{confirmedOrder.orderId}</span>
               </div>
               <div className="flex justify-between items-center text-xs">
                 <span className="text-zinc-500">Items:</span>
-                <span className="text-zinc-900 font-medium">{confirmedOrder.items[0]?.productTitle}</span>
+                <span className="text-zinc-950 font-medium">{confirmedOrder.items[0]?.productTitle}</span>
               </div>
               <div className="flex justify-between items-center text-xs">
                 <span className="text-zinc-500">Total Payable on Delivery:</span>
-                <span className="text-emerald-700 font-extrabold text-sm">{formatPrice(confirmedOrder.pricing.total)}</span>
+                <span className="text-zinc-950 font-black text-base">{formatPrice(confirmedOrder.pricing.total)}</span>
               </div>
               <div className="flex justify-between items-center text-xs">
                 <span className="text-zinc-500">Delivery Address:</span>
-                <span className="text-zinc-900 truncate max-w-[240px] font-medium">{confirmedOrder.customer.address}, {confirmedOrder.customer.city}, {confirmedOrder.customer.state}</span>
+                <span className="text-zinc-950 truncate max-w-[240px] font-medium">{confirmedOrder.customer.address}, {confirmedOrder.customer.city}, {confirmedOrder.customer.state}</span>
               </div>
               <div className="flex justify-between items-center text-xs">
                 <span className="text-zinc-500">Payment Terms:</span>
-                <span className="text-zinc-900 font-medium">100% Cash / Bank Transfer upon arrival</span>
+                <span className="text-zinc-950 font-medium">100% Cash / Bank Transfer upon arrival</span>
               </div>
             </div>
 
@@ -268,9 +263,9 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
                     onClose();
                     onOpenTrackingWithId(confirmedOrder.orderId);
                   }}
-                  className="flex-1 py-2.5 px-4 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-xs font-bold text-zinc-800 transition-colors flex items-center justify-center gap-1.5 cursor-pointer border border-zinc-200"
+                  className="flex-1 py-2.5 px-4 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-xs font-bold text-zinc-900 transition-colors flex items-center justify-center gap-1.5 cursor-pointer border border-zinc-200"
                 >
-                  <FileText className="w-4 h-4 text-[#b8860b]" />
+                  <FileText className="w-4 h-4 text-black" />
                   Track Consignment
                 </button>
                 <button
@@ -294,18 +289,18 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
                 className="w-20 h-16 sm:w-24 sm:h-20 object-cover rounded-lg border border-zinc-200 shrink-0"
               />
               <div className="flex-1 min-w-0">
-                <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300">
+                <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-yellow-400 text-black">
                   Special Promo Price
                 </span>
-                <h3 className="text-sm sm:text-base font-bold text-zinc-900 truncate mt-1">
+                <h3 className="text-sm sm:text-base font-bold text-zinc-950 truncate mt-1">
                   2-Burner 90° Flip-Up Glass Cooker
                 </h3>
                 <div className="flex items-center gap-2 mt-1">
                   <span className="text-xs text-zinc-400 line-through">₦250,000</span>
-                  <span className="text-sm sm:text-base font-extrabold text-zinc-900">
+                  <span className="text-sm sm:text-base font-black text-zinc-950">
                     {formatPrice(totalPrice)}
                   </span>
-                  <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold border border-emerald-300">
+                  <span className="text-[10px] bg-yellow-400/20 text-black px-1.5 py-0.5 rounded font-bold border border-yellow-400/50">
                     Free Delivery
                   </span>
                 </div>
@@ -314,7 +309,7 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
 
             {/* Quick Package Selector */}
             <div>
-              <label className="block text-xs font-bold text-zinc-900 mb-2 uppercase tracking-wide">
+              <label className="block text-xs font-bold text-zinc-950 mb-2 uppercase tracking-wide">
                 1. Select Quantity / Package:
               </label>
               <div className="grid grid-cols-3 gap-2 sm:gap-3">
@@ -323,12 +318,12 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
                   onClick={() => setQuantity(1)}
                   className={`p-2.5 sm:p-3 rounded-xl border text-center transition-all cursor-pointer ${
                     currentQuantity === 1
-                      ? 'border-[#d4af37] bg-amber-50/80 ring-2 ring-[#d4af37]/30 text-zinc-900 font-bold shadow-xs'
-                      : 'border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-700'
+                      ? 'border-2 border-yellow-400 bg-yellow-400/15 text-zinc-950 font-bold shadow-xs'
+                      : 'border-zinc-200 bg-white hover:border-yellow-400 text-zinc-700'
                   }`}
                 >
                   <span className="block text-xs font-semibold">1 Cooker</span>
-                  <span className="block text-sm font-extrabold text-zinc-900 mt-0.5">₦170,000</span>
+                  <span className="block text-sm font-extrabold text-zinc-950 mt-0.5">₦170,000</span>
                   <span className="block text-[10px] text-zinc-500">Save ₦80k</span>
                 </button>
 
@@ -337,16 +332,16 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
                   onClick={() => setQuantity(2)}
                   className={`p-2.5 sm:p-3 rounded-xl border text-center transition-all cursor-pointer relative ${
                     currentQuantity === 2
-                      ? 'border-[#d4af37] bg-amber-50/80 ring-2 ring-[#d4af37]/30 text-zinc-900 font-bold shadow-xs'
-                      : 'border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-700'
+                      ? 'border-2 border-yellow-400 bg-yellow-400/15 text-zinc-950 font-bold shadow-xs'
+                      : 'border-zinc-200 bg-white hover:border-yellow-400 text-zinc-700'
                   }`}
                 >
-                  <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-1.5 py-0.2 rounded-full text-[9px] font-extrabold bg-[#d4af37] text-black">
+                  <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-1.5 py-0.2 rounded-full text-[9px] font-black bg-yellow-400 text-black">
                     Popular
                   </span>
                   <span className="block text-xs font-semibold">2 Cookers</span>
-                  <span className="block text-sm font-extrabold text-zinc-900 mt-0.5">₦330,000</span>
-                  <span className="block text-[10px] text-emerald-700 font-bold">Extra ₦10k Off</span>
+                  <span className="block text-sm font-extrabold text-zinc-950 mt-0.5">₦330,000</span>
+                  <span className="block text-[10px] text-zinc-600 font-bold">Extra ₦10k Off</span>
                 </button>
 
                 <button
@@ -354,20 +349,20 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
                   onClick={() => setQuantity(3)}
                   className={`p-2.5 sm:p-3 rounded-xl border text-center transition-all cursor-pointer ${
                     currentQuantity === 3
-                      ? 'border-[#d4af37] bg-amber-50/80 ring-2 ring-[#d4af37]/30 text-zinc-900 font-bold shadow-xs'
-                      : 'border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-700'
+                      ? 'border-2 border-yellow-400 bg-yellow-400/15 text-zinc-950 font-bold shadow-xs'
+                      : 'border-zinc-200 bg-white hover:border-yellow-400 text-zinc-700'
                   }`}
                 >
                   <span className="block text-xs font-semibold">3 Cookers</span>
-                  <span className="block text-sm font-extrabold text-zinc-900 mt-0.5">₦480,000</span>
-                  <span className="block text-[10px] text-emerald-700 font-bold">Extra ₦30k Off</span>
+                  <span className="block text-sm font-extrabold text-zinc-950 mt-0.5">₦480,000</span>
+                  <span className="block text-[10px] text-zinc-600 font-bold">Extra ₦30k Off</span>
                 </button>
               </div>
             </div>
 
             {/* Direct Form */}
             <form onSubmit={handleSubmit} className="space-y-3.5">
-              <label className="block text-xs font-bold text-zinc-900 uppercase tracking-wide">
+              <label className="block text-xs font-bold text-zinc-950 uppercase tracking-wide">
                 2. Where Should We Deliver? (Payment on Delivery)
               </label>
 
@@ -375,7 +370,7 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
                 {/* Full Name */}
                 <div>
                   <label className="block text-[11px] text-zinc-700 font-medium mb-1">
-                    Full Name <span className="text-red-500">*</span>
+                    Full Name <span className="text-black font-bold">*</span>
                   </label>
                   <input
                     type="text"
@@ -383,14 +378,14 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="e.g. Chief Emeka Adeleke"
-                    className="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] transition-colors"
+                    className="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 transition-colors"
                   />
                 </div>
 
                 {/* Primary Phone */}
                 <div>
                   <label className="block text-[11px] text-zinc-700 font-medium mb-1 flex items-center justify-between">
-                    <span>Active Phone Number <span className="text-red-500">*</span></span>
+                    <span>Active Phone Number <span className="text-black font-bold">*</span></span>
                     <span className="text-[10px] text-zinc-500 font-normal">Rider will call</span>
                   </label>
                   <div className="relative">
@@ -401,7 +396,7 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="0803 123 4567"
-                      className="w-full bg-white border border-zinc-300 rounded-lg pl-8 pr-3 py-2 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] transition-colors"
+                      className="w-full bg-white border border-zinc-300 rounded-lg pl-8 pr-3 py-2 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 transition-colors"
                     />
                   </div>
                 </div>
@@ -410,7 +405,7 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
               {/* Delivery Address */}
               <div>
                 <label className="block text-[11px] text-zinc-700 font-medium mb-1">
-                  Street Address & Nearest Landmark <span className="text-red-500">*</span>
+                  Street Address &amp; Nearest Landmark <span className="text-black font-bold">*</span>
                 </label>
                 <div className="relative">
                   <MapPin className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-2.5" />
@@ -420,7 +415,7 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
                     placeholder="e.g. Plot 14 Admiralty Way, Lekki Phase 1, Near Ebeano"
-                    className="w-full bg-white border border-zinc-300 rounded-lg pl-8 pr-3 py-2 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] transition-colors"
+                    className="w-full bg-white border border-zinc-300 rounded-lg pl-8 pr-3 py-2 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 transition-colors"
                   />
                 </div>
               </div>
@@ -429,7 +424,7 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[11px] text-zinc-700 font-medium mb-1">
-                    City / Town / Area <span className="text-red-500">*</span>
+                    City / Town / Area <span className="text-black font-bold">*</span>
                   </label>
                   <input
                     type="text"
@@ -437,21 +432,21 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                     placeholder="e.g. Ikeja / Lekki / Wuse 2"
-                    className="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] transition-colors"
+                    className="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 transition-colors"
                   />
                 </div>
 
                 <div>
                   <label className="block text-[11px] text-zinc-700 font-medium mb-1">
-                    State <span className="text-red-500">*</span>
+                    State <span className="text-black font-bold">*</span>
                   </label>
                   <select
                     value={state}
                     onChange={(e) => setState(e.target.value)}
-                    className="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] transition-colors cursor-pointer"
+                    className="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 transition-colors cursor-pointer"
                   >
                     {NIGERIAN_STATES.map((st) => (
-                      <option key={st} value={st}>
+                      <option key={st} value={st} className="bg-white text-zinc-900">
                         {st}
                       </option>
                     ))}
@@ -463,14 +458,14 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[11px] text-zinc-700 font-medium mb-1">
-                    WhatsApp or Alternative Phone (Optional)
+                    Alternative Phone Line (Optional)
                   </label>
                   <input
                     type="tel"
                     value={altPhone}
                     onChange={(e) => setAltPhone(e.target.value)}
                     placeholder="Alternative line"
-                    className="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] transition-colors"
+                    className="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 transition-colors"
                   />
                 </div>
 
@@ -481,7 +476,7 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
                   <select
                     value={deliveryTiming}
                     onChange={(e) => setDeliveryTiming(e.target.value)}
-                    className="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] transition-colors cursor-pointer"
+                    className="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 transition-colors cursor-pointer"
                   >
                     <option value="Today / Tomorrow (Express Dispatch)">Today / Tomorrow (Express)</option>
                     <option value="Within 48 Hours">Within 48 Hours</option>
@@ -491,10 +486,10 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
               </div>
 
               {/* Trust Reassurance banner */}
-              <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-300 flex items-start gap-2.5 text-[11px] text-emerald-950">
-                <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+              <div className="p-3 rounded-lg bg-amber-50 border border-yellow-300 flex items-start gap-2.5 text-[11px] text-zinc-800">
+                <ShieldCheck className="w-4 h-4 text-yellow-600 shrink-0 mt-0.5" />
                 <span>
-                  <strong>Zero-Risk Guarantee:</strong> You do <strong>not</strong> pay a kobo in advance. When the dispatch rider arrives at your doorstep, inspect and test the gas cooker thoroughly before handing over payment (Cash or Bank Transfer).
+                  <strong className="text-zinc-950">Zero-Risk Guarantee:</strong> You do <strong>not</strong> pay a kobo in advance. When the dispatch rider arrives at your doorstep, inspect and test the gas cooker thoroughly before handing over payment (Cash or Bank Transfer).
                 </span>
               </div>
 
@@ -503,7 +498,7 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-[#d4af37] via-[#f3df88] to-[#d4af37] hover:from-[#c5a030] hover:to-[#c5a030] text-black font-black text-sm sm:text-base uppercase tracking-wider shadow-xl hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="w-full py-3.5 px-6 rounded-xl bg-yellow-400 hover:bg-yellow-300 text-black font-black text-sm sm:text-base uppercase tracking-wider shadow-lg shadow-yellow-500/20 hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <>
@@ -520,13 +515,13 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
 
                 <div className="flex items-center justify-between text-[11px] text-zinc-500 px-1 pt-1">
                   <span className="flex items-center gap-1">
-                    <Lock className="w-3 h-3 text-[#d4af37]" />
+                    <Lock className="w-3 h-3 text-yellow-600" />
                     Encrypted Direct Dispatch
                   </span>
                   <button
                     type="button"
                     onClick={onClose}
-                    className="hover:text-zinc-900 underline cursor-pointer"
+                    className="hover:text-black underline cursor-pointer"
                   >
                     Continue browsing
                   </button>
