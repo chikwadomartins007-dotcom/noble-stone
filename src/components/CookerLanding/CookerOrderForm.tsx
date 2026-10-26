@@ -16,6 +16,7 @@ import {
 import { COOKER_PACKAGES } from '../../data/cookerData';
 import { CustomerOrder } from '../../types';
 import { formatPrice, generateOrderId, generateWhatsAppOrderLink, NIGERIAN_STATES } from '../../utils/formatters';
+import { trackMetaPurchase, trackMetaContact } from '../../utils/metaPixel';
 
 interface CookerOrderFormProps {
   selectedQuantity: number;
@@ -154,6 +155,21 @@ export const CookerOrderForm: React.FC<CookerOrderFormProps> = ({
       console.error(err);
     }
 
+    // Trigger Meta Pixel & Conversions API Purchase Event
+    trackMetaPurchase({
+      orderId: newOrder.orderId,
+      total: newOrder.pricing.total,
+      quantity: selectedQuantity,
+      productTitle: packageTitle,
+      customer: {
+        fullName,
+        phone,
+        address,
+        city,
+        state,
+      },
+    });
+
     setConfirmedOrder(newOrder);
     setIsSubmitting(false);
     onOrderSuccess(newOrder);
@@ -235,6 +251,7 @@ export const CookerOrderForm: React.FC<CookerOrderFormProps> = ({
                 )}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackMetaContact('Order Form WhatsApp Dispatch', confirmedOrder.orderId)}
                 className="w-full py-4 px-6 rounded-xl bg-[#25D366] hover:bg-[#20ba5a] text-black font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-xl cursor-pointer"
               >
                 <MessageCircle className="w-5 h-5 fill-black" />

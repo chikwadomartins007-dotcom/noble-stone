@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { formatPrice, generateOrderId, generateWhatsAppOrderLink, NIGERIAN_STATES } from '../../utils/formatters';
 import { CustomerOrder } from '../../types';
+import { trackMetaPurchase, trackMetaContact, trackMetaInitiateCheckout } from '../../utils/metaPixel';
 
 interface CookerQuickOrderModalProps {
   isOpen: boolean;
@@ -150,6 +151,21 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
       console.error(err);
     }
 
+    // Trigger Meta Pixel & Conversions API Purchase Event
+    trackMetaPurchase({
+      orderId: newOrder.orderId,
+      total: newOrder.pricing.total,
+      quantity: currentQuantity,
+      productTitle: packageTitle,
+      customer: {
+        fullName,
+        phone,
+        address,
+        city,
+        state,
+      },
+    });
+
     setConfirmedOrder(newOrder);
     setIsSubmitting(false);
     onOrderSuccess(newOrder);
@@ -248,6 +264,7 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
                 )}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackMetaContact('Quick Order WhatsApp Dispatch', confirmedOrder.orderId)}
                 className="w-full flex items-center justify-center gap-2.5 py-3.5 px-6 rounded-xl bg-[#25D366] hover:bg-[#20ba5a] text-black font-extrabold text-sm shadow-lg hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer"
               >
                 <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">

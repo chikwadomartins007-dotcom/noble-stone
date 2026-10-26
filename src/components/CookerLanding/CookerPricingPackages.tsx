@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { COOKER_PACKAGES } from '../../data/cookerData';
 import { formatPrice } from '../../utils/formatters';
+import { trackMetaAddToCart } from '../../utils/metaPixel';
 
 interface CookerPricingPackagesProps {
   selectedQuantity: number;
@@ -19,6 +20,12 @@ export const CookerPricingPackages: React.FC<CookerPricingPackagesProps> = ({
   onScrollToOrder,
 }) => {
   const handleSelect = (qty: number) => {
+    const pkg = COOKER_PACKAGES.find(p => p.quantity === qty) || COOKER_PACKAGES[0];
+    trackMetaAddToCart({
+      quantity: pkg.quantity,
+      label: pkg.label,
+      price: pkg.totalPrice,
+    });
     onSelectQuantity(qty);
     onScrollToOrder();
   };

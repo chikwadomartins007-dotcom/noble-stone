@@ -15,6 +15,7 @@ import { CookerQuickOrderModal } from './components/CookerLanding/CookerQuickOrd
 import { CookerImage } from './data/cookerData';
 import { CustomerOrder } from './types';
 import { formatPrice, generateWhatsAppOrderLink } from './utils/formatters';
+import { trackMetaViewContent, trackMetaInitiateCheckout, trackMetaContact } from './utils/metaPixel';
 
 export default function App() {
   const [selectedQuantity, setSelectedQuantity] = useState<number>(1);
@@ -30,6 +31,11 @@ export default function App() {
 
   // Quick Order Popup state & 35-second interval timer
   const [isQuickOrderOpen, setIsQuickOrderOpen] = useState(false);
+
+  // Trigger Meta ViewContent event on page load
+  useEffect(() => {
+    trackMetaViewContent();
+  }, []);
 
   useEffect(() => {
     // If user has already placed an order, do not show pop up
@@ -49,6 +55,10 @@ export default function App() {
   }, [hasPlacedOrder]);
 
   const scrollToOrder = () => {
+    trackMetaInitiateCheckout({
+      quantity: selectedQuantity,
+      source: 'scroll_to_order_cta',
+    });
     const el = document.getElementById('order-form');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
@@ -176,6 +186,7 @@ export default function App() {
           }
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => trackMetaContact('Floating WhatsApp Button', latestOrder?.orderId)}
           className="fixed bottom-20 right-4 lg:bottom-6 lg:right-6 z-40 flex items-center gap-2.5 px-4 py-3 rounded-full bg-[#25D366] hover:bg-[#20ba5a] text-black font-extrabold shadow-2xl hover:scale-105 active:scale-95 transition-all group border border-emerald-300/40 cursor-pointer animate-fade-in"
           aria-label="Chat on WhatsApp 09117446764 regarding your placed order"
         >
