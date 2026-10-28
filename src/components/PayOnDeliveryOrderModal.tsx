@@ -145,7 +145,7 @@ export const PayOnDeliveryOrderModal: React.FC<PayOnDeliveryOrderModalProps> = (
 
     // Forward to Formspree for immediate store email alerts
     try {
-      await fetch('https://formspree.io/f/xyekoajq', {
+      await fetch('https://formspree.io/f/xdeeepeo', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

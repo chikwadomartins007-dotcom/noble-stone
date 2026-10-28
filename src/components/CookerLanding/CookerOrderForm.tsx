@@ -118,15 +118,16 @@ export const CookerOrderForm: React.FC<CookerOrderFormProps> = ({
       trackingNumber: orderId,
     };
 
-    // Forward to Formspree
+    // Forward to Formspree for instant email alert
     try {
-      await fetch('https://formspree.io/f/xyekoajq', {
+      const response = await fetch('https://formspree.io/f/xdeeepeo', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
         body: JSON.stringify({
+          _subject: `🔥 NEW ORDER #${orderId} - ${fullName} (₦${finalPrice.toLocaleString()})`,
           order_id: orderId,
           order_type: 'Main Pay on Delivery Form',
           customer_name: fullName,
@@ -144,6 +145,9 @@ export const CookerOrderForm: React.FC<CookerOrderFormProps> = ({
           order_timestamp: new Date().toLocaleString('en-NG', { timeZone: 'Africa/Lagos' }),
         }),
       });
+      if (!response.ok) {
+        console.warn('[Formspree] Server responded with status:', response.status);
+      }
     } catch (err) {
       console.error('Failed to notify Formspree:', err);
     }
@@ -312,7 +316,7 @@ export const CookerOrderForm: React.FC<CookerOrderFormProps> = ({
               </div>
             </div>
 
-            <form action="https://formspree.io/f/xyekoajq" method="POST" onSubmit={handleSubmit} className="space-y-6">
+            <form action="https://formspree.io/f/xdeeepeo" method="POST" onSubmit={handleSubmit} className="space-y-6">
               
               {/* Step 1: Package Choice */}
               <div className="space-y-3">
@@ -368,6 +372,7 @@ export const CookerOrderForm: React.FC<CookerOrderFormProps> = ({
                     </label>
                     <input
                       type="text"
+                      name="customer_full_name"
                       required
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
@@ -382,6 +387,7 @@ export const CookerOrderForm: React.FC<CookerOrderFormProps> = ({
                     </label>
                     <input
                       type="tel"
+                      name="phone_number"
                       required
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
@@ -398,6 +404,7 @@ export const CookerOrderForm: React.FC<CookerOrderFormProps> = ({
                     </label>
                     <input
                       type="tel"
+                      name="alternative_phone"
                       value={altPhone}
                       onChange={(e) => setAltPhone(e.target.value)}
                       placeholder="e.g. 0814 777 8029"
@@ -410,6 +417,7 @@ export const CookerOrderForm: React.FC<CookerOrderFormProps> = ({
                       State for Delivery <span className="text-black font-bold">*</span>
                     </label>
                     <select
+                      name="delivery_state"
                       value={state}
                       onChange={(e) => setState(e.target.value)}
                       className="w-full bg-white border border-zinc-300 rounded-lg px-3.5 py-2.5 text-xs text-zinc-900 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400"
@@ -427,6 +435,7 @@ export const CookerOrderForm: React.FC<CookerOrderFormProps> = ({
                   </label>
                   <input
                     type="text"
+                    name="city_town_lga"
                     required
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
@@ -441,6 +450,7 @@ export const CookerOrderForm: React.FC<CookerOrderFormProps> = ({
                   </label>
                   <input
                     type="text"
+                    name="delivery_address"
                     required
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
@@ -455,6 +465,7 @@ export const CookerOrderForm: React.FC<CookerOrderFormProps> = ({
                       When Do You Want Delivery?
                     </label>
                     <select
+                      name="delivery_schedule"
                       value={deliveryTiming}
                       onChange={(e) => setDeliveryTiming(e.target.value)}
                       className="w-full bg-white border border-zinc-300 rounded-lg px-3.5 py-2.5 text-xs text-zinc-900 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400"
@@ -472,6 +483,7 @@ export const CookerOrderForm: React.FC<CookerOrderFormProps> = ({
                     </label>
                     <input
                       type="text"
+                      name="special_instructions"
                       value={specialNotes}
                       onChange={(e) => setSpecialNotes(e.target.value)}
                       placeholder="e.g. Call my security man at gate before arriving"

@@ -114,17 +114,18 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
       trackingNumber: orderId,
     };
 
-    // Forward to Formspree
+    // Forward to Formspree for instant email alert
     try {
-      await fetch('https://formspree.io/f/xyekoajq', {
+      const response = await fetch('https://formspree.io/f/xdeeepeo', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
         body: JSON.stringify({
+          _subject: `⚡ QUICK POPUP ORDER #${orderId} - ${fullName} (₦${totalPrice.toLocaleString()})`,
           order_id: orderId,
-          order_type: 'Quick Order Pop-Up',
+          order_type: 'Quick Order Pop-Up (35s Interval)',
           customer_name: fullName,
           phone_number: phone,
           alternative_phone: altPhone || phone,
@@ -140,6 +141,9 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
           order_timestamp: new Date().toLocaleString('en-NG', { timeZone: 'Africa/Lagos' }),
         }),
       });
+      if (!response.ok) {
+        console.warn('[Formspree] Quick order response status:', response.status);
+      }
     } catch (err) {
       console.error('Failed to notify Formspree:', err);
     }
@@ -391,6 +395,7 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
                   </label>
                   <input
                     type="text"
+                    name="customer_full_name"
                     required
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
@@ -409,6 +414,7 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
                     <Phone className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-2.5" />
                     <input
                       type="tel"
+                      name="phone_number"
                       required
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
@@ -428,6 +434,7 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
                   <MapPin className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-2.5" />
                   <input
                     type="text"
+                    name="delivery_address"
                     required
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
@@ -445,6 +452,7 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
                   </label>
                   <input
                     type="text"
+                    name="city_town_area"
                     required
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
@@ -458,6 +466,7 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
                     State <span className="text-black font-bold">*</span>
                   </label>
                   <select
+                    name="delivery_state"
                     value={state}
                     onChange={(e) => setState(e.target.value)}
                     className="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 transition-colors cursor-pointer"
@@ -479,6 +488,7 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
                   </label>
                   <input
                     type="tel"
+                    name="alternative_phone"
                     value={altPhone}
                     onChange={(e) => setAltPhone(e.target.value)}
                     placeholder="Alternative line"
@@ -491,6 +501,7 @@ export const CookerQuickOrderModal: React.FC<CookerQuickOrderModalProps> = ({
                     Preferred Delivery Timing
                   </label>
                   <select
+                    name="delivery_timing"
                     value={deliveryTiming}
                     onChange={(e) => setDeliveryTiming(e.target.value)}
                     className="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-zinc-900 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 transition-colors cursor-pointer"
